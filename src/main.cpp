@@ -1,159 +1,65 @@
+#include "rover.hpp"
 #include <iostream>
+#include <fstream>
 #include <vector>
 
 using namespace std;
 
-struct roverPosition
+void readInput(vector<Rover> *rovers)
 {
-    int x;
-    int y;
-    char orientation;
-};
-
-struct rover
-{
-    roverPosition roverPosition;
-    string instructions;
-};
-
-struct input
-{
-    pair<int, int> plateauCoordinates;
-    vector<rover> rovers;
-};
-
-struct output
-{
-    vector<roverPosition> roversFinalPositions;
-};
-
-input readInput()
-{
-    int numberOfRovers;
+    ifstream infile("input");
     int x, y;
     char orientation;
-    roverPosition roverPosition;
     string instructions;
-    rover rover;
-    input input;
+    Rover rover;
 
-    cin >> numberOfRovers;
-    cin >> x >> y;
-
-    input.plateauCoordinates = make_pair(x, y);
-
-    for (int i = 0; i < numberOfRovers; i++)
+    while (!infile.eof())
     {
-        cin >> x >> y >> orientation;
-        cin >> instructions;
-
-        roverPosition.x = x;
-        roverPosition.y = y;
-        roverPosition.orientation = orientation;
-
-        rover.roverPosition = roverPosition;
-        rover.instructions = instructions;
-
-        input.rovers.push_back(rover);
+        infile >> x >> y >> orientation;
+        infile >> instructions;
+        cout << x << " " << y << " " << orientation << " " << instructions << endl;
+        rover = Rover(x, y, orientation, instructions);
+        rovers->push_back(rover);
     }
-
-    return input;
 }
 
-// TODO: plateauCoordinates coordinates check should be handled
-// TODO: switch case should be grouped
-roverPosition applyInstructions(rover rover)
+void printOutput(vector<Rover> *rovers)
 {
-    roverPosition roverFinalPosition = rover.roverPosition;
-    char instruction, orientation;
-
-    for (int i = 0; i < rover.instructions.length(); i++)
+    for (int i = 0; i < (*rovers).size(); i++)
     {
-        instruction = rover.instructions[i];
-        orientation = roverFinalPosition.orientation;
-        switch (instruction)
-        {
-        case 'R':
-        case 'L':
-            switch (orientation)
-            {
-            case 'N':
-                instruction == 'R' ? roverFinalPosition.orientation = 'E' : roverFinalPosition.orientation = 'W';
-                break;
-            case 'E':
-                instruction == 'R' ? roverFinalPosition.orientation = 'S' : roverFinalPosition.orientation = 'N';
-                break;
-            case 'S':
-                instruction == 'R' ? roverFinalPosition.orientation = 'W' : roverFinalPosition.orientation = 'E';
-                break;
-            case 'W':
-                instruction == 'R' ? roverFinalPosition.orientation = 'N' : roverFinalPosition.orientation = 'S';
-                break;
-
-            // TODO: default case handle
-            default:
-                break;
-            }
-            break;
-
-        case 'M':
-            switch (orientation)
-            {
-            case 'N':
-                roverFinalPosition.y++;
-                break;
-            case 'E':
-                roverFinalPosition.x++;
-                break;
-            case 'S':
-                roverFinalPosition.y--;
-                break;
-            case 'W':
-                roverFinalPosition.x--;
-                break;
-
-            // TODO: default case handle
-            default:
-                break;
-            }
-            break;
-
-        default:
-            cout << "Invalid instruction" << endl;
-            break;
-        }
-    }
-    return roverFinalPosition;
-}
-
-void printOutput(output output)
-{
-    roverPosition position;
-    for (int i = 0; i < output.roversFinalPositions.size(); i++)
-    {
-        position = output.roversFinalPositions[i];
-        cout << position.x << " " << position.y << " " << position.orientation << endl;
+        cout << (*rovers)[i].GetX() << " " << (*rovers)[i].GetY() << " " << (*rovers)[i].GetOrientation() << endl;
     }
 }
 
 int main()
 {
-    input input;
-    output output;
+    int x, y;
+    string instructions;
+    pair<int, int> plateauCoordinates;
+    vector<Rover> rovers;
 
     // read input
-    input = readInput();
+    cin >> x >> y;
+    plateauCoordinates = make_pair(x, y);
+    cout << x << " " << y << endl;
+    readInput(&rovers);
 
     // logic
-    for (int i = 0; i < input.rovers.size(); i++)
+    // TODO: handle errors such as
+    //       invalid instruction
+    //       moving outside of the plateauCoordinates
+    for (int i = 0; i < rovers.size(); i++)
     {
-        roverPosition roverFinalPosition;
-        roverFinalPosition = applyInstructions(input.rovers[i]);
-        output.roversFinalPositions.push_back(roverFinalPosition);
+        instructions = rovers[i].GetInstructions();
+        cout << "instructions: " << instructions << endl;
+        for (int j = 0; j < instructions.length(); j++)
+        {
+            rovers[i].applyInstruction(instructions[j]);
+        }
     }
 
     // print output
-    printOutput(output);
+    printOutput(&rovers);
 
     return 0;
 }

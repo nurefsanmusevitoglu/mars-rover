@@ -3,6 +3,5 @@
 #
 
 all: 
-	@echo "hello, world!"
-	g++ src/main.cpp
-	./a.out < input
+	g++ -Wall src/main.cpp src/rover.hpp src/rover.cpp
+	./a.out
