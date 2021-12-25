@@ -4,4 +4,4 @@
 
 all: 
 	g++ -Wall src/main.cpp src/rover.hpp src/rover.cpp
-	./a.out
+	./a.out "input"

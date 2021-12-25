@@ -7,8 +7,9 @@ using namespace std;
 Rover::Rover() {}
 
 // constructor
-Rover::Rover(int x1, int y1, char o, string i)
+Rover::Rover(int id1, int x1, int y1, char o, string i)
 {
+    id = id1;
     x = x1;
     y = y1;
     orientation = o;
@@ -16,16 +17,25 @@ Rover::Rover(int x1, int y1, char o, string i)
 }
 
 // copy constructor
-Rover::Rover(const Rover& r)
+Rover::Rover(const Rover &r)
 {
-    cout << "Copy constructor called " << endl;
+    id = r.id;
+    x = r.x;
+    y = r.y;
+    orientation = r.orientation;
+    instructions = r.instructions;
 }
 
 // assignment operator
-Rover& Rover::operator=(const Rover& r)
+Rover &Rover::operator=(const Rover &r)
 {
-    cout << "Assignment operator called " << endl;
     return *this;
+}
+
+// get id
+int Rover::GetId()
+{
+    return id;
 }
 
 // get x
@@ -53,31 +63,64 @@ string Rover::GetInstructions()
 }
 
 // applyInstruction function
-void Rover::applyInstruction(char instruction)
+void Rover::applyInstruction(char instruction, pair<int, int> plateauCoordinates)
 {
-    // cout << "In apply function..." << endl;
-    // cout << "instruction: " << instruction << endl;
+    int newX = x, newY = y;
+
     switch (orientation)
     {
     case 'N':
-        instruction == 'M' ? y++ : (instruction == 'R' ? orientation = 'E' : orientation = 'W');
+        instruction == 'M' ? newY++ : (instruction == 'R' ? orientation = 'E' : orientation = 'W');
         break;
 
     case 'E':
-        instruction == 'M' ? x++ : (instruction == 'R' ? orientation = 'S' : orientation = 'N');
+        instruction == 'M' ? newX++ : (instruction == 'R' ? orientation = 'S' : orientation = 'N');
         break;
 
     case 'S':
-        instruction == 'M' ? y-- : (instruction == 'R' ? orientation = 'W' : orientation = 'E');
+        instruction == 'M' ? newY-- : (instruction == 'R' ? orientation = 'W' : orientation = 'E');
         break;
 
     case 'W':
-        instruction == 'M' ? x-- : (instruction == 'R' ? orientation = 'N' : orientation = 'S');
-        break;
-
-    default:
-        cout << "Invalid orientation: " << orientation << endl;
+        instruction == 'M' ? newX-- : (instruction == 'R' ? orientation = 'N' : orientation = 'S');
         break;
     }
-    // cout << "Out from apply function..." << endl;
+
+    checkNewCoordinates(newX, newY, plateauCoordinates);
+}
+
+void Rover::checkNewCoordinates(int newX, int newY, pair<int, int> plateauCoordinates)
+{
+    if (!(newX < 0 || newX > plateauCoordinates.first ||
+        newY < 0 || newY > plateauCoordinates.second))
+    {
+        x = newX;
+        y = newY;
+    }
+    else
+    {
+        cerr << "Move instruction leads to the outside of the plateau, coordinates: ";
+        cerr << x << " " << y << " " << orientation << endl;
+    }
+}
+
+
+
+bool Rover::checkInstruction(char instruction)
+{
+    if (instruction == 'M' || instruction == 'R' || instruction == 'L')
+    {
+        return true;
+    }
+    return false;
+}
+
+bool Rover::checkOrientation()
+{
+    if (orientation == 'N' || orientation == 'E' ||
+        orientation == 'S' || orientation == 'W')
+    {
+        return true;
+    }
+    return false;
 }
