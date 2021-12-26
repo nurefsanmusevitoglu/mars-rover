@@ -1,68 +1,31 @@
-#include "rover.hpp"
+#include "../lib/rover.hpp"
+#include "../lib/handler.hpp"
 #include <iostream>
 #include <fstream>
 #include <vector>
 
 using namespace std;
 
-typedef pair<int, int> intPair;
-
-intPair readInput(vector<Rover> *rovers, string filename)
-{
-    pair<int, int> plateauCoordinates;
-    int id = 1, x, y;
-    char orientation;
-    string instructions;
-    Rover *rover;
-    ifstream infile(filename);
-    if (infile.fail())
-    {
-        throw runtime_error("Could not find file: " + filename);
-    }
-
-    infile >> x >> y;
-    plateauCoordinates = make_pair(x, y);
-    cout << "plateauCoordinates: " << x << " " << y << endl;
-    while (!infile.eof())
-    {
-        infile >> x >> y >> orientation >> instructions;
-        cout << x << " " << y << " " << orientation << " " << instructions << endl;
-        rover = new Rover(id++, x, y, orientation, instructions);
-        rovers->push_back(*rover);
-    }
-
-    return plateauCoordinates;
-}
-
-void printOutput(vector<Rover> *rovers)
-{
-    for (int i = 0; i < (*rovers).size(); i++)
-    {
-        cout << (*rovers)[i].GetX() << " ";
-        cout << (*rovers)[i].GetY() << " ";
-        cout << (*rovers)[i].GetOrientation() << endl;
-    }
-}
-
 int main(int argc, char **argv)
 {
     string filename = argv[1];
     string instructions;
-    intPair plateauCoordinates;
+    pair<int, int> plateauCoordinates;
     vector<Rover> rovers;
+    Handler handler;
 
     try
     {
         // read input
-        plateauCoordinates = readInput(&rovers, filename);
+        handler.readInput(&rovers, &plateauCoordinates, filename);
 
-        // logic
         /*
          * traverse through all the rovers and apply instructions
          * if the orientation is invalid, pass the rover
          * if an instruction is invalid, skip the instruction
          * if a move instruction leads to the outside of the plateau, skip the instruction
          */
+        // logic
         for (int i = 0; i < rovers.size(); i++)
         {
             if (rovers[i].checkOrientation())
@@ -89,7 +52,7 @@ int main(int argc, char **argv)
         }
 
         // print output
-        printOutput(&rovers);
+        handler.printOutput(&rovers);
 
         return EXIT_SUCCESS;
     }

@@ -1,7 +1,22 @@
-#include "rover.hpp"
+#include "../lib/rover.hpp"
 #include <iostream>
 
 using namespace std;
+
+enum instructionType
+{
+    MOVE = 'M',
+    LEFT = 'L',
+    RIGHT = 'R'
+};
+
+enum orientationType
+{
+    NORTH = 'N',
+    EAST = 'E',
+    SOUTH = 'S',
+    WEST = 'W'
+};
 
 // default constructor
 Rover::Rover() {}
@@ -69,30 +84,34 @@ void Rover::applyInstruction(char instruction, pair<int, int> plateauCoordinates
 
     switch (orientation)
     {
-    case 'N':
-        instruction == 'M' ? newY++ : (instruction == 'R' ? orientation = 'E' : orientation = 'W');
+    case NORTH:
+        instruction == MOVE ? newY++ : (instruction == RIGHT ? orientation = EAST : orientation = WEST);
         break;
 
-    case 'E':
-        instruction == 'M' ? newX++ : (instruction == 'R' ? orientation = 'S' : orientation = 'N');
+    case EAST:
+        instruction == MOVE ? newX++ : (instruction == RIGHT ? orientation = SOUTH : orientation = NORTH);
         break;
 
-    case 'S':
-        instruction == 'M' ? newY-- : (instruction == 'R' ? orientation = 'W' : orientation = 'E');
+    case SOUTH:
+        instruction == MOVE ? newY-- : (instruction == RIGHT ? orientation = WEST : orientation = EAST);
         break;
 
-    case 'W':
-        instruction == 'M' ? newX-- : (instruction == 'R' ? orientation = 'N' : orientation = 'S');
+    case WEST:
+        instruction == MOVE ? newX-- : (instruction == RIGHT ? orientation = NORTH : orientation = SOUTH);
         break;
     }
 
-    checkNewCoordinates(newX, newY, plateauCoordinates);
+    if (instruction == MOVE)
+    {
+        checkNewCoordinates(newX, newY, plateauCoordinates);
+    }
 }
 
+// check new coordinates
 void Rover::checkNewCoordinates(int newX, int newY, pair<int, int> plateauCoordinates)
 {
     if (!(newX < 0 || newX > plateauCoordinates.first ||
-        newY < 0 || newY > plateauCoordinates.second))
+          newY < 0 || newY > plateauCoordinates.second))
     {
         x = newX;
         y = newY;
@@ -100,25 +119,26 @@ void Rover::checkNewCoordinates(int newX, int newY, pair<int, int> plateauCoordi
     else
     {
         cerr << "Move instruction leads to the outside of the plateau, coordinates: ";
-        cerr << x << " " << y << " " << orientation << endl;
+        cerr << x << " " << y << " " << orientation << ", ";
+        cerr << "for Rover with id: " << id << endl;
     }
 }
 
-
-
+// check instruction type
 bool Rover::checkInstruction(char instruction)
 {
-    if (instruction == 'M' || instruction == 'R' || instruction == 'L')
+    if (instruction == MOVE || instruction == RIGHT || instruction == LEFT)
     {
         return true;
     }
     return false;
 }
 
+// check orientation type
 bool Rover::checkOrientation()
 {
-    if (orientation == 'N' || orientation == 'E' ||
-        orientation == 'S' || orientation == 'W')
+    if (orientation == NORTH || orientation == EAST ||
+        orientation == SOUTH || orientation == WEST)
     {
         return true;
     }
